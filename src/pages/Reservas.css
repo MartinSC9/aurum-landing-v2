@@ -78,6 +78,21 @@
   border: 1px solid var(--line);
 }
 
+.reservas-avatar-initial {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(201,168,76,0.1);
+  border: 1px solid var(--line);
+  color: var(--gold);
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 500;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
 .reservas-profile h2 {
   font-family: var(--serif);
   font-weight: 400;

@@ -1,7 +1,8 @@
 import { FaInstagram, FaYoutube, FaWhatsapp, FaCalendarAlt, FaGraduationCap, FaArrowRight } from 'react-icons/fa';
 import './LinkInBio.css';
 
-const AVATAR = 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&q=80';
+// Avatar placeholder — replace with Daniel's real photo
+const AVATAR = null;
 
 const LINKS = [
   {
@@ -39,12 +40,16 @@ export default function LinkInBio() {
         {/* Profile */}
         <div className="bio-profile">
           <div className="bio-avatar-ring">
-            <img src={AVATAR} alt="Daniel Segura" className="bio-avatar-img" />
+            {AVATAR ? (
+              <img src={AVATAR} alt="Daniel Segura" className="bio-avatar-img" />
+            ) : (
+              <div className="bio-avatar-placeholder">DS</div>
+            )}
           </div>
           <div className="bio-handle">@danielseguraf</div>
           <h1 className="bio-name">Daniel Segura</h1>
           <p className="bio-tagline">
-            Ayudo a hombres de 30–50 anos a estar con la mujer de sus suenos
+            Ayudo a hombres de 30-50 anos a atraer mujeres de alto valor con confianza
           </p>
           <div className="bio-socials">
             <a href="https://instagram.com/danielseguraf" target="_blank" rel="noreferrer"><FaInstagram size={18} /></a>
