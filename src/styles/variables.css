@@ -1,0 +1,30 @@
+:root {
+  /* Brand colors — from Claude Design */
+  --bg: #0a0a0a;
+  --bg-elev: #111111;
+  --bg-card: #161412;
+  --line: rgba(201, 168, 76, 0.18);
+  --line-soft: rgba(245, 241, 232, 0.08);
+  --gold: #c9a84c;
+  --gold-bright: #d4af37;
+  --gold-soft: #b8943a;
+  --ink: #f5f1e8;
+  --ink-muted: #b8b3a7;
+  --ink-dim: #6f6a5e;
+  --green: #4a7c59;
+  --green-text: #7ab389;
+  --red: #8c3a3a;
+  --red-text: #c47a7a;
+
+  /* Typography */
+  --serif: 'Cormorant Garamond', 'Cormorant', Georgia, serif;
+  --sans: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+  --mono: 'JetBrains Mono', 'Menlo', monospace;
+
+  /* Layout */
+  --max: 1280px;
+  --gutter: clamp(20px, 4vw, 56px);
+
+  /* Transitions */
+  --transition: 0.3s ease;
+}
