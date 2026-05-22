@@ -2,7 +2,23 @@ import { useState, useEffect, useRef } from 'react';
 import { FaInstagram, FaYoutube, FaWhatsapp, FaCheck, FaTimes, FaPlay, FaUsers, FaCalendarCheck, FaBrain, FaTshirt, FaComments, FaShieldAlt, FaUserCheck, FaChevronDown, FaChevronUp, FaVideo, FaGlobeAmericas, FaHandshake, FaLock } from 'react-icons/fa';
 import './Landing.css';
 
-const HERO_VIDEO = 'https://videos.pexels.com/video-files/5528029/5528029-uhd_2560_1440_30fps.mp4';
+const HERO_VIDEO = 'https://videos.pexels.com/video-files/3129957/3129957-uhd_2560_1440_30fps.mp4';
+
+const IMG = {
+  daniel: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&q=80',
+  natalia: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80',
+  vsl: 'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=1280&q=80',
+  event: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80',
+  method1: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=600&q=80',
+  method2: 'https://images.unsplash.com/photo-1617137968427-85924c800a22?w=600&q=80',
+  method3: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600&q=80',
+  avatars: [
+    'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80',
+    'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&q=80',
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80',
+    'https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=100&q=80',
+  ],
+};
 
 const TESTIMONIALS = [
   {
@@ -145,8 +161,8 @@ export default function Landing() {
           </div>
           <div className="hero-proof">
             <div className="hero-avatars">
-              {['S', 'A', 'V', 'R', 'M'].map((letter, i) => (
-                <div key={i} className="hero-avatar-initial">{letter}</div>
+              {IMG.avatars.map((src, i) => (
+                <img key={i} src={src} alt="" className="hero-avatar" />
               ))}
             </div>
             <div className="hero-proof-text">
@@ -213,16 +229,20 @@ export default function Landing() {
           </div>
           <div className="method-grid reveal">
             {[
-              { num: '01', icon: <FaBrain size={28} />, title: 'Reprogramacion Mental', text: 'Elimina las creencias que te frenan. Desarrolla una mentalidad de alto valor que las mujeres perciben naturalmente en tu forma de hablar, moverte y decidir.', accent: 'mental' },
-              { num: '02', icon: <FaTshirt size={28} />, title: 'Transformacion de Imagen', text: 'Optimiza tu estilo, tu lenguaje corporal y tu presencia. Genera una primera impresion que abre puertas antes de decir una sola palabra.', accent: 'imagen' },
-              { num: '03', icon: <FaComments size={28} />, title: 'Sistema de Conexion', text: 'Aprende a iniciar conversaciones, generar tension y crear conexiones genuinas que terminan en citas reales. No scripts, sino habilidades.', accent: 'conexion' },
+              { num: '01', icon: <FaBrain size={28} />, img: IMG.method1, title: 'Reprogramacion Mental', text: 'Elimina las creencias que te frenan. Desarrolla una mentalidad de alto valor que las mujeres perciben naturalmente en tu forma de hablar, moverte y decidir.', accent: 'mental' },
+              { num: '02', icon: <FaTshirt size={28} />, img: IMG.method2, title: 'Transformacion de Imagen', text: 'Optimiza tu estilo, tu lenguaje corporal y tu presencia. Genera una primera impresion que abre puertas antes de decir una sola palabra.', accent: 'imagen' },
+              { num: '03', icon: <FaComments size={28} />, img: IMG.method3, title: 'Sistema de Conexion', text: 'Aprende a iniciar conversaciones, generar tension y crear conexiones genuinas que terminan en citas reales. No scripts, sino habilidades.', accent: 'conexion' },
             ].map((p, i) => (
-              <div key={i} className={`method-card method-${p.accent}`}>
-                <div className="method-card-accent" />
-                <div className="method-icon">{p.icon}</div>
-                <div className="method-number">{p.num}</div>
-                <h3>{p.title}</h3>
-                <p>{p.text}</p>
+              <div key={i} className={`method-card method-${p.accent}`} style={{ backgroundImage: `url(${p.img})` }}>
+                <div className="method-card-overlay" />
+                <div className="method-card-content">
+                  <div className="method-icon">{p.icon}</div>
+                  <div>
+                    <div className="method-number">{p.num}</div>
+                    <h3>{p.title}</h3>
+                    <p>{p.text}</p>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
@@ -236,10 +256,8 @@ export default function Landing() {
           <h2>Mira como funciona el <em>Metodo Aurum</em> en 12 minutos</h2>
           <p className="lede" style={{ margin: '0 auto 40px' }}>Daniel te explica el sistema completo y por que funciona donde otros metodos fallan.</p>
           <div className="vsl-video">
-            <div className="vsl-placeholder">
-              <div className="vsl-play-btn"><FaPlay size={28} /></div>
-              <span className="vsl-placeholder-text">Video del Metodo Aurum</span>
-            </div>
+            <img src={IMG.vsl} alt="Video del Metodo Aurum" className="vsl-thumb" />
+            <div className="vsl-play-btn"><FaPlay size={28} /></div>
           </div>
           <div className="vsl-urgency">
             <FaLock size={12} />
@@ -269,7 +287,7 @@ export default function Landing() {
                 <div className="testimonial-stars">★★★★★</div>
                 <blockquote>{t.text}</blockquote>
                 <div className="testimonial-author">
-                  <div className="testimonial-initial">{t.initial}</div>
+                  <img src={IMG.avatars[i % IMG.avatars.length]} alt={t.name} className="testimonial-avatar" />
                   <div>
                     <div className="name">{t.name}</div>
                     <div className="role">{t.role}, {t.age} anos · {t.city}</div>
@@ -291,10 +309,7 @@ export default function Landing() {
           <div className="about-grid reveal">
             <div className="about-card">
               <div className="about-img-wrapper">
-                <div className="about-placeholder">
-                  <span>Foto de Daniel</span>
-                  <small>@danielseguraf · 488K</small>
-                </div>
+                <img src={IMG.daniel} alt="Daniel Segura" />
               </div>
               <p className="about-handle">@danielseguraf · 488K seguidores</p>
               <h3>Daniel Segura</h3>
@@ -302,10 +317,7 @@ export default function Landing() {
             </div>
             <div className="about-card">
               <div className="about-img-wrapper">
-                <div className="about-placeholder">
-                  <span>Foto de Natalia</span>
-                  <small>@natabuitragom</small>
-                </div>
+                <img src={IMG.natalia} alt="Natalia Buitrago" />
               </div>
               <p className="about-handle">@natabuitragom</p>
               <h3>Natalia Buitrago</h3>
@@ -339,11 +351,7 @@ export default function Landing() {
         <div className="container">
           <div className="events-content reveal">
             <div className="events-image">
-              <div className="events-placeholder">
-                <FaUsers size={40} />
-                <span>Fotos de eventos reales</span>
-                <small>Bogota · Buenos Aires · Mexico DF</small>
-              </div>
+              <img src={IMG.event} alt="Evento Aurum en Bogota" />
             </div>
             <div className="events-text">
               <span className="eyebrow">En vivo</span>

@@ -1,8 +1,7 @@
 import { FaInstagram, FaYoutube, FaWhatsapp, FaCalendarAlt, FaGraduationCap, FaArrowRight } from 'react-icons/fa';
 import './LinkInBio.css';
 
-// Avatar placeholder — replace with Daniel's real photo
-const AVATAR = null;
+const AVATAR = 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&q=80';
 
 const LINKS = [
   {

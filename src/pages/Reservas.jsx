@@ -79,7 +79,7 @@ export default function Reservas() {
             {/* Sidebar */}
             <div className="reservas-info">
               <div className="reservas-profile">
-                <div className="reservas-avatar-initial">DS</div>
+                <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&q=80" alt="Daniel Segura" className="reservas-avatar" />
                 <div>
                   <h2 style={{ fontSize: 24 }}>Mentoring 1 a 1</h2>
                   <p className="reservas-subtitle">con Daniel Segura</p>
