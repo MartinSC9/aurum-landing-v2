@@ -436,7 +436,7 @@ export default function Landing() {
       <FloatingButtons />
 
       {/* ─── Nav ─── */}
-      <nav className={`nav ${navScrolled ? 'nav--scrolled' : ''} ${splashDone ? 'nav--visible' : ''}`}>
+      <nav className={`nav ${navScrolled ? 'nav--scrolled' : ''} ${splashDone ? 'nav--visible' : ''} ${mobileMenu ? 'nav--menu-open' : ''}`}>
         <div className="nav__inner">
           <a href="#top" className="nav__brand">
             <span className="nav__wordmark">AURUM</span>

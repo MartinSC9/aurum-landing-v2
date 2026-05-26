@@ -317,12 +317,29 @@
 @media (max-width: 860px) {
   .floating-btns {
     bottom: 80px;
-    right: 16px;
+    right: 12px;
+    gap: 8px;
   }
-  .float-btn { width: 48px; height: 48px; }
-  .float-btn--ig { width: 40px; height: 40px; }
-  .float-btn--top { width: 36px; height: 36px; }
+  .float-btn { width: 40px; height: 40px; font-size: 13px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25); }
+  .float-btn--wa svg { width: 14px; height: 14px; }
+  .float-btn--yt { width: 36px; height: 36px; font-size: 12px; }
+  .float-btn--yt svg { width: 14px; height: 14px; }
+  .float-btn--ig { width: 36px; height: 36px; font-size: 12px; }
+  .float-btn--ig svg { width: 14px; height: 14px; }
+  .float-btn--top { width: 32px; height: 32px; font-size: 12px; }
   .float-btn__tooltip { display: none; }
+}
+
+@media (max-width: 480px) {
+  .floating-btns {
+    bottom: 76px;
+    right: 8px;
+    gap: 6px;
+  }
+  .float-btn { width: 36px; height: 36px; font-size: 12px; opacity: 0.85; }
+  .float-btn--yt { width: 32px; height: 32px; }
+  .float-btn--ig { width: 32px; height: 32px; }
+  .float-btn--top { width: 28px; height: 28px; font-size: 10px; }
 }
 
 /* ── CURSOR GLOW ────────────────────────────────────── */
@@ -563,6 +580,11 @@
 
 @media (max-width: 860px) {
   .nav__hamburger { display: flex; }
+  .nav--menu-open {
+    background: rgba(12, 14, 20, 0.98);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+  }
   .nav__links {
     display: none;
     position: fixed;
