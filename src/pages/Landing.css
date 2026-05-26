@@ -572,6 +572,7 @@
     display: none;
     position: fixed;
     inset: 72px 0 0 0;
+    z-index: 200;
     flex-direction: column;
     background: #0c0e14;
     padding: 48px var(--gutter);
