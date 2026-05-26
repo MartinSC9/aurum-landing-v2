@@ -1,17 +1,28 @@
 :root {
-  /* Brand colors — from Claude Design */
-  --bg: #0a0a0a;
-  --bg-elev: #111111;
-  --bg-card: #161412;
-  --line: rgba(201, 168, 76, 0.18);
-  --line-soft: rgba(245, 241, 232, 0.08);
-  --gold: #c9a84c;
-  --gold-bright: #d4af37;
-  --gold-soft: #b8943a;
-  --ink: #f5f1e8;
-  --ink-muted: #b8b3a7;
-  --ink-dim: #6f6a5e;
-  --green: #4a7c59;
+  /* ── Premium palette ── */
+  /* Deep blue-black base — sophisticated, not cheap black */
+  --bg: #0c0e14;
+  --bg-elev: #13151d;
+  --bg-card: #181b25;
+
+  /* Subtle borders */
+  --line: rgba(255, 255, 255, 0.07);
+  --line-soft: rgba(255, 255, 255, 0.04);
+
+  /* Warm bronze accent — luxury watches, not nightclub gold */
+  --accent: #b8926a;
+  --accent-light: #d4ad82;
+  --accent-soft: #a07d56;
+  --accent-glow: rgba(184, 146, 106, 0.08);
+  --accent-glow-md: rgba(184, 146, 106, 0.15);
+
+  /* Text — warm cream, not harsh white */
+  --ink: #f0ece6;
+  --ink-muted: #a39d95;
+  --ink-dim: #6b6560;
+
+  /* Semantic */
+  --green: #5b9a6f;
   --green-text: #7ab389;
   --red: #8c3a3a;
   --red-text: #c47a7a;
@@ -22,9 +33,14 @@
   --mono: 'JetBrains Mono', 'Menlo', monospace;
 
   /* Layout */
-  --max: 1280px;
+  --max: 1200px;
   --gutter: clamp(20px, 4vw, 56px);
 
   /* Transitions */
-  --transition: 0.3s ease;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Legacy compat for admin pages */
+  --gold: var(--accent);
+  --gold-bright: var(--accent-light);
+  --gold-soft: var(--accent-soft);
 }

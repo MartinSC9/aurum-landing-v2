@@ -11,6 +11,7 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 80px;
 }
 
 body {
@@ -20,7 +21,58 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-size: 16px;
+  font-size: 15px;
+  font-weight: 400;
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(184, 146, 106, 0.03) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 50%, rgba(100, 130, 180, 0.02) 0%, transparent 40%),
+    radial-gradient(ellipse at 20% 80%, rgba(184, 146, 106, 0.02) 0%, transparent 40%);
+}
+
+/* ── Noise grain overlay ── */
+.page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px;
+}
+
+/* ── Dot grid pattern ── */
+.dot-grid {
+  background-image: radial-gradient(rgba(184, 146, 106, 0.07) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* ── Section glow orbs ── */
+.glow-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.glow-orb--bronze {
+  background: rgba(184, 146, 106, 0.08);
+}
+
+.glow-orb--blue {
+  background: rgba(100, 130, 180, 0.05);
+}
+
+.glow-orb {
+  animation: glowDrift 20s ease-in-out infinite;
+}
+
+@keyframes glowDrift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(25px, -15px) scale(1.06); }
+  66% { transform: translate(-15px, 20px) scale(0.94); }
 }
 
 a {
@@ -38,6 +90,7 @@ button {
   border: none;
   background: none;
   font-family: inherit;
+  color: inherit;
 }
 
 .container {
@@ -46,32 +99,18 @@ button {
   padding: 0 var(--gutter);
 }
 
-/* Typography */
-.display {
-  font-family: var(--serif);
-  font-size: clamp(42px, 5.5vw, 72px);
-  font-weight: 300;
-  line-height: 1.05;
-  letter-spacing: -0.02em;
-  color: var(--ink);
-}
-
-.display em {
-  font-style: italic;
-  color: var(--gold);
-}
-
+/* ── Typography ── */
 h2 {
   font-family: var(--serif);
-  font-size: clamp(36px, 4vw, 56px);
+  font-size: clamp(28px, 3.2vw, 44px);
   font-weight: 300;
-  line-height: 1.1;
+  line-height: 1.15;
   letter-spacing: -0.01em;
 }
 
 h2 em {
   font-style: italic;
-  color: var(--gold);
+  color: var(--accent);
 }
 
 h3 {
@@ -79,13 +118,6 @@ h3 {
   font-size: clamp(22px, 2.5vw, 30px);
   font-weight: 400;
   line-height: 1.2;
-}
-
-h4 {
-  font-family: var(--serif);
-  font-size: 24px;
-  font-weight: 400;
-  line-height: 1.15;
 }
 
 .lede {
@@ -100,33 +132,33 @@ h4 {
   font-size: 11px;
   letter-spacing: 0.24em;
   text-transform: uppercase;
-  color: var(--gold);
+  color: var(--accent);
 }
 
-/* Buttons */
+/* ── Buttons ── */
 .btn {
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  padding: 18px 36px;
-  transition: all 0.3s ease;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 16px 32px;
+  transition: all 0.4s var(--ease);
   white-space: nowrap;
+  border-radius: 4px;
 }
 
 .btn-primary {
-  background: var(--gold);
-  color: #0a0a0a;
-  font-weight: 500;
+  background: var(--accent);
+  color: var(--bg);
 }
 
 .btn-primary:hover {
-  background: var(--gold-bright);
+  background: var(--accent-light);
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(201, 168, 76, 0.25);
+  box-shadow: 0 8px 30px rgba(184, 146, 106, 0.2);
 }
 
 .btn-ghost {
@@ -135,8 +167,8 @@ h4 {
 }
 
 .btn-ghost:hover {
-  border-color: var(--gold);
-  color: var(--gold);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .btn .arrow {
@@ -147,16 +179,11 @@ h4 {
   transform: translateX(4px);
 }
 
-/* Gold text utility */
-.gold-text {
-  color: var(--gold);
-}
-
-/* Reveal on scroll */
+/* ── Reveal on scroll ── */
 .reveal {
   opacity: 0;
   transform: translateY(24px);
-  transition: opacity 0.8s ease, transform 0.8s ease;
+  transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
 }
 
 .reveal.in {
@@ -164,10 +191,21 @@ h4 {
   transform: none;
 }
 
+.reveal-child {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+}
+
+.reveal-child.in {
+  opacity: 1;
+  transform: none;
+}
+
 @media (max-width: 768px) {
   .btn {
-    padding: 16px 28px;
-    font-size: 11px;
+    padding: 14px 24px;
+    font-size: 13px;
     width: 100%;
     justify-content: center;
   }

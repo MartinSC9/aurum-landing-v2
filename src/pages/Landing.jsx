@@ -1,420 +1,841 @@
-import { useState, useEffect, useRef } from 'react';
-import { FaInstagram, FaYoutube, FaWhatsapp, FaCheck, FaTimes, FaPlay, FaUsers, FaCalendarCheck, FaBrain, FaTshirt, FaComments, FaShieldAlt, FaUserCheck, FaChevronDown, FaChevronUp, FaVideo, FaGlobeAmericas, FaHandshake, FaLock } from 'react-icons/fa';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { motion, useInView, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import {
+  FaInstagram, FaYoutube, FaWhatsapp, FaTiktok, FaPlay,
+  FaArrowRight, FaCalendarAlt, FaMapMarkerAlt, FaGlobeAmericas,
+  FaCheck, FaStar
+} from 'react-icons/fa';
 import './Landing.css';
 
-const HERO_VIDEO = 'https://videos.pexels.com/video-files/3129957/3129957-uhd_2560_1440_30fps.mp4';
-
+// ── Assets ──────────────────────────────────────────────
 const IMG = {
-  daniel: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&q=80',
-  natalia: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80',
-  vsl: 'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=1280&q=80',
-  event: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80',
-  method1: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=600&q=80',
-  method2: 'https://images.unsplash.com/photo-1617137968427-85924c800a22?w=600&q=80',
-  method3: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600&q=80',
-  avatars: [
-    'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80',
-    'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&q=80',
-    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80',
-    'https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=100&q=80',
-  ],
+  // Fotos reales de aurumteam.com
+  daniel: 'https://aurumteam.com/wp-content/uploads/2025/09/Diseno-sin-titulo-25-e1758220296330-939x1024.png',
+  natalia: 'https://aurumteam.com/wp-content/uploads/2025/09/Diseno-sin-titulo-30-e1758220265309-798x1024.png',
+  // Screenshots reales de testimonios
+  proof1: 'https://aurumteam.com/wp-content/uploads/2025/09/1.png',
+  proof2: 'https://aurumteam.com/wp-content/uploads/2025/09/2.png',
+  proof3: 'https://aurumteam.com/wp-content/uploads/2025/09/3.png',
+  proof4: 'https://aurumteam.com/wp-content/uploads/2025/09/4.png',
+  proof5: 'https://aurumteam.com/wp-content/uploads/2025/09/5.png',
+  proof6: 'https://aurumteam.com/wp-content/uploads/2025/09/6.png',
+  proof7: 'https://aurumteam.com/wp-content/uploads/2025/09/7.png',
+  proof8: 'https://aurumteam.com/wp-content/uploads/2025/09/8.png',
+  proof9: 'https://aurumteam.com/wp-content/uploads/2025/09/9.png',
+  proof10: 'https://aurumteam.com/wp-content/uploads/2025/09/10.png',
+  // Lifestyle premium (Unsplash)
+  about: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=900&q=80',
+  method1: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=800&q=80',
+  method2: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=800&q=80',
+  vsl: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=1280&q=80',
 };
 
 const TESTIMONIALS = [
-  {
-    initial: 'S',
-    name: 'Santiago R.',
-    age: 24,
-    role: 'Economista',
-    city: 'Buenos Aires',
-    text: 'Antes no podia ni mantener una conversacion con una mujer sin quedarme en blanco. Despues de 2 meses con el Metodo, empece a abordar en cualquier lugar con naturalidad. Hoy salgo con mujeres que antes creia imposibles para mi.',
-  },
-  {
-    initial: 'A',
-    name: 'Alfonso M.',
-    age: 55,
-    role: 'Ingeniero',
-    city: 'Bogota',
-    text: 'A los 55 pense que ya era tarde para cambiar. Me habia divorciado y no sabia ni por donde empezar. En 3 meses pase de cero opciones a tener 13 mujeres interesadas. La perspectiva de Natalia fue clave para entender que buscan ellas.',
-  },
-  {
-    initial: 'V',
-    name: 'Victor L.',
-    age: 25,
-    role: 'Abogado',
-    city: 'Mexico DF',
-    text: 'Llevaba 5 anos en la friendzone con la chica que me gustaba. Daniel me hizo ver todo lo que estaba haciendo mal. Hoy entiendo como funciona la atraccion y genero interes de forma natural, sin forzar nada.',
-  },
-  {
-    initial: 'R',
-    name: 'Roberto S.',
-    age: 38,
-    role: 'Empresario',
-    city: 'Medellin',
-    text: 'La mentoria 1 a 1 con Daniel fue la mejor inversion que hice en mi vida. En una sola sesion me mostro los errores que venia arrastrando hace anos. En 3 meses todo cambio por completo, tanto en citas como en confianza personal.',
-  },
+  { name: 'Santiago', role: 'Economista', age: 24, before: 'No podía hablarle a una mujer sin temblar', text: 'Hoy abro en cualquier bar, en la calle, en eventos. Tengo 4 opciones reales y elijo yo. El método te cambia la vida, literal.', video: 'https://aurumteam.com/wp-content/uploads/2025/09/T.-Santiago-1-1.mp4' },
+  { name: 'Alfonso', role: 'Ingeniero', age: 55, before: 'A los 55 pensé que ya era tarde', text: 'Hoy tengo 13 opciones con mujeres de alto valor. La perspectiva de Natalia fue clave — me hizo entender lo que ellas realmente quieren.', video: 'https://aurumteam.com/wp-content/uploads/2025/09/T.-alfonzo-55-1.mp4' },
+  { name: 'Víctor', role: 'Abogado', age: 25, before: '5 años en la friendzone sin entender por qué', text: 'Daniel me hizo ver todo lo que estaba haciendo mal en 1 sesión. A las 2 semanas ya tenía mi primera cita real. Hoy no paro.', video: 'https://aurumteam.com/wp-content/uploads/2025/09/T.-Victor-1.mp4' },
 ];
 
-const STATS = [
-  { number: '247', label: 'Hombres transformados', suffix: '+' },
-  { number: '20', label: 'Paises', suffix: '+' },
-  { number: '12', label: 'Anos de experiencia', suffix: '+' },
-  { number: '4.9', label: 'Valoracion media', suffix: '★' },
+const MARQUEE_WORDS = [
+  'Confianza', 'Presencia', 'Conexión', 'Transformación',
+  'Mentalidad', 'Liderazgo', 'Atracción', 'Autenticidad'
 ];
 
-const BENEFITS = [
-  { icon: <FaShieldAlt />, title: 'Aborda a cualquier mujer en 3 segundos', text: 'Domina el arte de la apertura con un sistema probado. Nunca mas te quedes paralizado viendo pasar a la mujer que te gusta.' },
-  { icon: <FaComments />, title: 'Conversaciones que generan atraccion real', text: 'Elimina las charlas aburridas que no llevan a nada. Genera interes y curiosidad desde los primeros 5 minutos.' },
-  { icon: <FaUserCheck />, title: 'Estrategia personalizada para tu caso', text: 'Analisis profundo con sesiones 1 a 1. Plan de accion adaptado a tu personalidad, tu edad y tus objetivos.' },
-  { icon: <FaVideo />, title: 'Sistema completo de +40 horas', text: 'Acceso 24/7 a todo el contenido. Sin teoria vacia: estrategias probadas por +247 hombres en situaciones reales.' },
-  { icon: <FaHandshake />, title: 'Practica real con acompanamiento en campo', text: 'Salidas donde te acompanamos en vivo y te mostramos como funciona. Demostraciones directas, feedback inmediato.' },
-  { icon: <FaGlobeAmericas />, title: 'Comunidad privada de hombres en accion', text: 'Red exclusiva con hombres de 20+ paises que estan en el mismo camino. Experiencias, motivacion y networking real.' },
-];
+// ── Animation variants ──────────────────────────────────
+const fadeUp = {
+  hidden: { opacity: 0, y: 40 },
+  visible: (i = 0) => ({
+    opacity: 1, y: 0,
+    transition: { duration: 0.7, delay: i * 0.15, ease: [0.22, 1, 0.36, 1] }
+  }),
+};
 
-const FAQ_DATA = [
-  { q: 'Necesito experiencia previa con mujeres?', a: 'No. El programa esta disenado para cualquier nivel. Muchos de nuestros alumnos mas exitosos empezaron desde cero absoluto. El sistema te lleva paso a paso desde donde estes ahora.' },
-  { q: 'Funciona si soy timido o introvertido?', a: 'Si, y muchas veces con ventaja. Los introvertidos suelen proyectar misterio y profundidad, que son cualidades atractivas. El metodo te ensena a usar tu personalidad a tu favor, no a convertirte en alguien que no sos.' },
-  { q: 'Cuanto tiempo toma ver resultados?', a: 'La mayoria empieza a notar cambios en las primeras 2-4 semanas: mas confianza, mejores conversaciones, mas atencion femenina. Resultados solidos en citas en 2-3 meses con practica constante.' },
-  { q: 'Cuanto cuesta el programa?', a: 'Tenemos diferentes opciones segun tu situacion. El primer paso es agendar una sesion de diagnostico donde evaluamos tu caso y te explicamos cual es el plan ideal para vos. La sesion 1 a 1 con Daniel es de $99 USD.' },
-  { q: 'Voy a tener contacto directo con Daniel y Natalia?', a: 'Si. Dependiendo del plan, vas a tener acceso a sesiones 1 a 1 por videollamada, seguimiento por WhatsApp y acompanamiento presencial en salidas de campo.' },
-  { q: 'Puedo acceder desde cualquier pais?', a: 'Si. Tenemos alumnos en mas de 20 paises. Las sesiones son por videollamada, el contenido es 100% online, y los eventos presenciales se hacen en distintas ciudades de Latinoamerica.' },
-];
+const fadeIn = {
+  hidden: { opacity: 0 },
+  visible: (i = 0) => ({
+    opacity: 1,
+    transition: { duration: 0.8, delay: i * 0.12 }
+  }),
+};
 
-function FAQItem({ item }) {
-  const [open, setOpen] = useState(false);
+const scaleIn = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: {
+    opacity: 1, scale: 1,
+    transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] }
+  },
+};
+
+// ── FlipWords ───────────────────────────────────────────
+function FlipWords({ words, duration = 2400 }) {
+  const [index, setIndex] = useState(0);
+  const [exiting, setExiting] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setExiting(true);
+      setTimeout(() => {
+        setIndex(prev => (prev + 1) % words.length);
+        setExiting(false);
+      }, 400);
+    }, duration);
+    return () => clearTimeout(timer);
+  }, [index, duration, words.length]);
+
   return (
-    <div className="faq-item">
-      <button className="faq-question" onClick={() => setOpen(!open)}>
-        <span>{item.q}</span>
-        {open ? <FaChevronUp /> : <FaChevronDown />}
-      </button>
-      {open && <p className="faq-answer">{item.a}</p>}
+    <span className={`flip-word ${exiting ? 'flip-word--exit' : ''}`}>
+      {words[index]}
+    </span>
+  );
+}
+
+// ── NumberTicker ────────────────────────────────────────
+function NumberTicker({ value, suffix = '', duration = 2000 }) {
+  const [display, setDisplay] = useState(0);
+  const [started, setStarted] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) setStarted(true); },
+      { threshold: 0.5 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!started) return;
+    const start = performance.now();
+    let raf;
+    const animate = (now) => {
+      const progress = Math.min((now - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - progress, 4);
+      setDisplay(Math.round(value * ease));
+      if (progress < 1) raf = requestAnimationFrame(animate);
+    };
+    raf = requestAnimationFrame(animate);
+    return () => { if (raf) cancelAnimationFrame(raf); };
+  }, [started, value, duration]);
+
+  return <span ref={ref}>{display}{suffix}</span>;
+}
+
+// ── Section wrapper ─────────────────────────────────────
+function Section({ children, className = '', id }) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: '-80px' });
+  return (
+    <motion.section
+      ref={ref}
+      id={id}
+      className={className}
+      initial="hidden"
+      animate={isInView ? 'visible' : 'hidden'}
+      variants={{ visible: { transition: { staggerChildren: 0.12 } } }}
+    >
+      {children}
+    </motion.section>
+  );
+}
+
+// ── Marquee ─────────────────────────────────────────────
+function Marquee() {
+  return (
+    <div className="marquee">
+      <div className="marquee__track">
+        {[...MARQUEE_WORDS, ...MARQUEE_WORDS, ...MARQUEE_WORDS].map((item, i) => (
+          <span key={i} className="marquee__item">{item}</span>
+        ))}
+      </div>
     </div>
   );
 }
 
-function useReveal() {
+// ── VSL Player ──────────────────────────────────────────
+function VslSection() {
   const ref = useRef(null);
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); }),
-      { threshold: 0.15 }
-    );
-    const els = ref.current?.querySelectorAll('.reveal');
-    els?.forEach(el => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
-  return ref;
-}
+  const videoRef = useRef(null);
+  const isInView = useInView(ref, { once: false, margin: '-100px' });
 
-export default function Landing() {
-  const [mobileMenu, setMobileMenu] = useState(false);
-  const pageRef = useReveal();
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (isInView) {
+      v.play().catch(() => {});
+    } else {
+      v.pause();
+    }
+  }, [isInView]);
 
   return (
-    <div className="landing" ref={pageRef}>
-      {/* WhatsApp Floating */}
-      <a href="https://wa.me/message" className="whatsapp-float" target="_blank" rel="noreferrer">
-        <FaWhatsapp size={28} />
-      </a>
+    <motion.section
+      ref={ref}
+      className="vsl"
+      initial="hidden"
+      animate={isInView ? 'visible' : 'hidden'}
+    >
+      <div className="container">
+        <motion.div variants={fadeUp} className="vsl__header">
+          <span className="eyebrow">Video</span>
+          <h2>Conoce el método <em>Aurum</em></h2>
+        </motion.div>
+      </div>
+      <motion.div variants={scaleIn} className="vsl__player vsl__player--playing">
+        <video ref={videoRef} className="vsl__video" controls muted preload="metadata" controlsList="nodownload" playsInline>
+          <source src="/vsl-aurum.mp4" type="video/mp4" />
+        </video>
+      </motion.div>
+    </motion.section>
+  );
+}
 
-      {/* Nav */}
-      <nav className="navbar">
-        <div className="navbar-inner">
-          <a href="#top" className="navbar-logo">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <path d="M12 3 L22 21 L2 21 Z" stroke="#c9a84c" strokeWidth="1.5" fill="none" />
-              <path d="M12 9 L17 19 L7 19 Z" fill="#c9a84c" />
-            </svg>
-            <span className="gold-text">AURUM</span>
+// ── Cursor glow ─────────────────────────────────────────
+function CursorGlow() {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const move = (e) => {
+      el.style.left = e.clientX + 'px';
+      el.style.top = e.clientY + 'px';
+    };
+    window.addEventListener('mousemove', move, { passive: true });
+    return () => window.removeEventListener('mousemove', move);
+  }, []);
+  return <div ref={ref} className="cursor-glow" />;
+}
+
+// ── Floating particles ──────────────────────────────────
+function Particles({ count = 24 }) {
+  const particles = useRef(
+    Array.from({ length: count }, (_, i) => ({
+      id: i,
+      left: Math.random() * 100,
+      delay: Math.random() * 20,
+      duration: 12 + Math.random() * 18,
+      size: 1.5 + Math.random() * 2.5,
+      opacity: 0.15 + Math.random() * 0.25,
+    }))
+  ).current;
+
+  return (
+    <div className="particles" aria-hidden>
+      {particles.map(p => (
+        <span
+          key={p.id}
+          className="particle"
+          style={{
+            left: p.left + '%',
+            width: p.size + 'px',
+            height: p.size + 'px',
+            opacity: p.opacity,
+            animationDelay: p.delay + 's',
+            animationDuration: p.duration + 's',
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+// ── Parallax image ──────────────────────────────────────
+function ParallaxImg({ src, alt, speed = 0.15, className = '' }) {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
+  const y = useTransform(scrollYProgress, [0, 1], [`-${speed * 100}%`, `${speed * 100}%`]);
+  return (
+    <div ref={ref} className={`parallax-wrap ${className}`}>
+      <motion.img src={src} alt={alt} style={{ y }} className="parallax-img" loading="lazy" />
+    </div>
+  );
+}
+
+// ── Splash screen ───────────────────────────────────────
+let splashPlayed = false;
+
+function SplashScreen({ onComplete }) {
+  const [visible, setVisible] = useState(true);
+  const letters = 'AURUM'.split('');
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setVisible(false);
+      setTimeout(onComplete, 600);
+    }, 2400);
+    return () => clearTimeout(timer);
+  }, [onComplete]);
+
+  return (
+    <div className={`splash ${!visible ? 'splash--exit' : ''}`}>
+      <div className="splash__content">
+        <div className="splash__logo">
+          <svg viewBox="0 0 24 24" fill="none" className="splash__icon">
+            <path d="M12 2 L22 22 L2 22 Z" stroke="currentColor" strokeWidth="1" fill="none" className="splash__tri-outer" />
+            <path d="M12 8 L18 20 L6 20 Z" fill="currentColor" className="splash__tri-inner" />
+          </svg>
+        </div>
+        <div className="splash__halo" />
+        <div className="splash__flash" />
+        <div className="splash__text">
+          {letters.map((ch, i) => (
+            <span key={i} className="splash__letter" style={{ '--i': i }}>{ch}</span>
+          ))}
+        </div>
+        <span className="splash__tagline">Transformación masculina</span>
+      </div>
+    </div>
+  );
+}
+
+// ── Floating buttons ────────────────────────────────────
+function FloatingButtons() {
+  const [showTop, setShowTop] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setShowTop(window.scrollY > 600);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  return (
+    <div className="floating-btns">
+      <a
+        href="https://api.aurumteam.com/1a1daniel"
+        target="_blank"
+        rel="noreferrer"
+        className="float-btn float-btn--wa"
+        aria-label="Reservar sesión"
+      >
+        <FaCalendarAlt size={18} />
+        <span className="float-btn__tooltip">Reservá tu sesión</span>
+      </a>
+      <a
+        href="https://www.youtube.com/@teoriadepoder"
+        target="_blank"
+        rel="noreferrer"
+        className="float-btn float-btn--yt"
+        aria-label="YouTube"
+      >
+        <FaYoutube size={20} />
+      </a>
+      <a
+        href="https://instagram.com/danielseguraf"
+        target="_blank"
+        rel="noreferrer"
+        className="float-btn float-btn--ig"
+        aria-label="Instagram"
+      >
+        <FaInstagram size={20} />
+      </a>
+      {showTop && (
+        <button
+          className="float-btn float-btn--top"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          aria-label="Volver arriba"
+        >
+          ↑
+        </button>
+      )}
+    </div>
+  );
+}
+
+// ── Hero video carousel ─────────────────────────────────
+const HERO_VIDEOS = ['/hero-event-1.mp4', '/hero-event-2.mp4', '/hero-event-3.mp4'];
+
+function HeroVideoCarousel() {
+  const [active, setActive] = useState(0);
+  const videoRefs = useRef([]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActive(prev => (prev + 1) % HERO_VIDEOS.length);
+    }, 8000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    videoRefs.current.forEach((v, i) => {
+      if (!v) return;
+      if (i === active) {
+        v.currentTime = 0;
+        v.play().catch(() => {});
+      } else {
+        v.pause();
+      }
+    });
+  }, [active]);
+
+  return (
+    <>
+      {HERO_VIDEOS.map((src, i) => (
+        <video
+          key={i}
+          ref={el => (videoRefs.current[i] = el)}
+          className={`hero__video ${i === active ? 'hero__video--active' : ''}`}
+          muted
+          playsInline
+          loop
+          preload={i === 0 ? 'auto' : 'metadata'}
+          poster="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+        >
+          <source src={src} type="video/mp4" />
+        </video>
+      ))}
+      <div className="hero__video-dots">
+        {HERO_VIDEOS.map((_, i) => (
+          <button
+            key={i}
+            className={`hero__video-dot ${i === active ? 'hero__video-dot--active' : ''}`}
+            onClick={() => setActive(i)}
+            aria-label={`Video ${i + 1}`}
+          />
+        ))}
+      </div>
+    </>
+  );
+}
+
+// ── Main ────────────────────────────────────────────────
+export default function Landing() {
+  const [mobileMenu, setMobileMenu] = useState(false);
+  const [navScrolled, setNavScrolled] = useState(false);
+  const [splashDone, setSplashDone] = useState(splashPlayed);
+
+  const handleSplashComplete = useCallback(() => {
+    splashPlayed = true;
+    setSplashDone(true);
+  }, []);
+
+  useEffect(() => {
+    if (!splashDone) {
+      document.body.style.overflow = 'hidden';
+      return () => { document.body.style.overflow = ''; };
+    }
+  }, [splashDone]);
+
+  useEffect(() => {
+    const onScroll = () => setNavScrolled(window.scrollY > 60);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = mobileMenu ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileMenu]);
+
+  return (
+    <div className="page">
+      {!splashDone && <SplashScreen onComplete={handleSplashComplete} />}
+      <CursorGlow />
+      <Particles />
+      <FloatingButtons />
+
+      {/* ─── Nav ─── */}
+      <nav className={`nav ${navScrolled ? 'nav--scrolled' : ''} ${splashDone ? 'nav--visible' : ''}`}>
+        <div className="nav__inner">
+          <a href="#top" className="nav__brand">
+            <span className="nav__wordmark">AURUM</span>
           </a>
-          <div className={`navbar-links ${mobileMenu ? 'navbar-links-open' : ''}`}>
-            <a href="#metodo" onClick={() => setMobileMenu(false)}>Metodo</a>
+          <div className={`nav__links ${mobileMenu ? 'nav__links--open' : ''}`}>
+            <a href="#sobre-mi" onClick={() => setMobileMenu(false)}>Sobre mí</a>
+            <a href="#metodo" onClick={() => setMobileMenu(false)}>Método</a>
             <a href="#resultados" onClick={() => setMobileMenu(false)}>Resultados</a>
-            <a href="#nosotros" onClick={() => setMobileMenu(false)}>Fundadores</a>
-            <a href="#eventos" onClick={() => setMobileMenu(false)}>Eventos</a>
-            <a href="/reservas" className="btn btn-nav" onClick={() => setMobileMenu(false)}>Agendar sesion</a>
+            <a href="#contacto" onClick={() => setMobileMenu(false)}>Contacto</a>
+            <a href="https://api.aurumteam.com/1a1daniel" className="btn btn-primary shine-sweep nav__cta" onClick={() => setMobileMenu(false)}>
+              Quiero mi sesión
+            </a>
           </div>
-          <button className="navbar-hamburger" onClick={() => setMobileMenu(!mobileMenu)}>
+          <button className={`nav__hamburger ${mobileMenu ? 'nav__hamburger--open' : ''}`} onClick={() => setMobileMenu(!mobileMenu)} aria-label="Menu">
             <span /><span /><span />
           </button>
         </div>
       </nav>
 
-      {/* Hero */}
-      <section className="hero" id="top">
-        <div className="hero-media">
-          <video className="hero-video" autoPlay muted loop playsInline>
-            <source src={HERO_VIDEO} type="video/mp4" />
-          </video>
-          <div className="hero-overlay" />
-        </div>
-        <div className="hero-content">
-          <div className="hero-badge">Metodo Aurum 2.0 · Inscripciones abiertas</div>
-          <h1>Deja de conformarte y empieza a atraer a la <em>mujer que realmente te gusta</em></h1>
-          <p className="hero-sub">
-            El sistema que ya usaron +247 hombres en 20 paises para pasar de la inseguridad a tener las citas que siempre quisieron. Con acompanamiento real, no teoria.
-          </p>
-          <div className="hero-ctas">
-            <a href="/reservas" className="btn btn-primary">Agendar sesion de diagnostico <span className="arrow">→</span></a>
-            <a href="#vsl" className="btn btn-ghost">Ver como funciona · 12 min</a>
-          </div>
-          <div className="hero-proof">
-            <div className="hero-avatars">
-              {IMG.avatars.map((src, i) => (
-                <img key={i} src={src} alt="" className="hero-avatar" />
-              ))}
-            </div>
-            <div className="hero-proof-text">
-              <div className="hero-proof-stars">★★★★★</div>
-              <div><strong>+247 hombres transformados</strong> en 20+ paises</div>
-            </div>
-          </div>
-        </div>
-        <div className="hero-scroll"><FaChevronDown /></div>
-      </section>
+      {/* ─── Hero ─── */}
+      <section className={`hero ${splashDone ? 'hero--ready' : ''}`} id="top">
+        <HeroVideoCarousel />
+        <div className="hero__overlay" />
+        <div className="glow-orb glow-orb--bronze" style={{ top: '10%', left: '60%', width: 600, height: 600 }} />
 
-      {/* Stats */}
-      <section className="stats">
-        <div className="stats-grid">
-          {STATS.map((s, i) => (
-            <div key={i} className="stat-item reveal">
-              <span className="stat-number">{s.number}<span className="stat-suffix">{s.suffix}</span></span>
-              <span className="stat-label">{s.label}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Audience */}
-      <section className="audience">
-        <div className="container">
-          <div className="section-head reveal">
-            <span className="eyebrow">Perfil de alumno</span>
-            <h2>Para hombres cansados de <em>conformarse</em></h2>
-          </div>
-          <div className="audience-grid reveal">
-            <div className="audience-card yes">
-              <div className="card-badge"><span className="card-badge-dot" /> Esto es para vos</div>
-              <h3>Aplica si...</h3>
-              <ul className="audience-list">
-                <li><span className="icon-circle"><FaCheck size={10} /></span> Queres tener 5-6 citas al mes con mujeres que realmente te atraen</li>
-                <li><span className="icon-circle"><FaCheck size={10} /></span> Estas soltero o divorciado y queres volver al juego con confianza</li>
-                <li><span className="icon-circle"><FaCheck size={10} /></span> Buscas una relacion de alto valor, no algo pasajero</li>
-                <li><span className="icon-circle"><FaCheck size={10} /></span> Estas dispuesto a invertir en tu crecimiento personal</li>
-                <li><span className="icon-circle"><FaCheck size={10} /></span> Tenes entre 21 y 60 anos</li>
-              </ul>
-            </div>
-            <div className="audience-card no">
-              <div className="card-badge"><span className="card-badge-dot" /> No es para vos</div>
-              <h3>No apliques si...</h3>
-              <ul className="audience-list">
-                <li><span className="icon-circle"><FaTimes size={10} /></span> Buscas frases magicas o trucos rapidos</li>
-                <li><span className="icon-circle"><FaTimes size={10} /></span> No estas dispuesto a hacer cambios reales en tu vida</li>
-                <li><span className="icon-circle"><FaTimes size={10} /></span> Queres manipular o enganar mujeres</li>
-                <li><span className="icon-circle"><FaTimes size={10} /></span> No podes comprometerte con un proceso de al menos 2 meses</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Method */}
-      <section id="metodo" className="method">
-        <div className="container">
-          <div className="section-head reveal">
-            <span className="eyebrow">El sistema</span>
-            <h2>Los 3 pilares del <em>Metodo Aurum</em></h2>
-            <p className="lede">Un sistema integral que transforma tu mentalidad, tu imagen y tu forma de conectar con mujeres de alto valor.</p>
-          </div>
-          <div className="method-grid reveal">
-            {[
-              { num: '01', icon: <FaBrain size={28} />, img: IMG.method1, title: 'Reprogramacion Mental', text: 'Elimina las creencias que te frenan. Desarrolla una mentalidad de alto valor que las mujeres perciben naturalmente en tu forma de hablar, moverte y decidir.', accent: 'mental' },
-              { num: '02', icon: <FaTshirt size={28} />, img: IMG.method2, title: 'Transformacion de Imagen', text: 'Optimiza tu estilo, tu lenguaje corporal y tu presencia. Genera una primera impresion que abre puertas antes de decir una sola palabra.', accent: 'imagen' },
-              { num: '03', icon: <FaComments size={28} />, img: IMG.method3, title: 'Sistema de Conexion', text: 'Aprende a iniciar conversaciones, generar tension y crear conexiones genuinas que terminan en citas reales. No scripts, sino habilidades.', accent: 'conexion' },
-            ].map((p, i) => (
-              <div key={i} className={`method-card method-${p.accent}`} style={{ backgroundImage: `url(${p.img})` }}>
-                <div className="method-card-overlay" />
-                <div className="method-card-content">
-                  <div className="method-icon">{p.icon}</div>
-                  <div>
-                    <div className="method-number">{p.num}</div>
-                    <h3>{p.title}</h3>
-                    <p>{p.text}</p>
-                  </div>
-                </div>
+        <div className="hero__content">
+          <div className="hero__intro-group">
+            <div className="hero__intro-item" style={{ '--intro-i': 0 }}>
+              <div className="hero__badge">
+                <img src={IMG.daniel} alt="Daniel Segura" className="hero__avatar" />
+                <span>Daniel Segura · 488K seguidores</span>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* VSL */}
-      <section id="vsl" className="vsl">
-        <div className="vsl-content reveal">
-          <span className="eyebrow">Conoce el metodo</span>
-          <h2>Mira como funciona el <em>Metodo Aurum</em> en 12 minutos</h2>
-          <p className="lede" style={{ margin: '0 auto 40px' }}>Daniel te explica el sistema completo y por que funciona donde otros metodos fallan.</p>
-          <div className="vsl-video">
-            <img src={IMG.vsl} alt="Video del Metodo Aurum" className="vsl-thumb" />
-            <div className="vsl-play-btn"><FaPlay size={28} /></div>
-          </div>
-          <div className="vsl-urgency">
-            <FaLock size={12} />
-            <span>Cupos limitados · Solo aceptamos 10 alumnos nuevos por mes</span>
-          </div>
-          <a href="/reservas" className="btn btn-primary" style={{ marginTop: 24 }}>
-            Quiero mi sesion de diagnostico <span className="arrow">→</span>
-          </a>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section id="resultados" className="testimonials">
-        <div className="container">
-          <div className="section-head reveal">
-            <div>
-              <span className="eyebrow">Resultados reales</span>
-              <h2>Hombres que ya <em>lo lograron</em></h2>
             </div>
-            <div className="section-meta">
-              <strong>+247 transformaciones</strong> · 35+ casos documentados en video
-            </div>
-          </div>
-          <div className="testimonials-grid reveal">
-            {TESTIMONIALS.map((t, i) => (
-              <div key={i} className="testimonial-card">
-                <div className="testimonial-stars">★★★★★</div>
-                <blockquote>{t.text}</blockquote>
-                <div className="testimonial-author">
-                  <img src={IMG.avatars[i % IMG.avatars.length]} alt={t.name} className="testimonial-avatar" />
-                  <div>
-                    <div className="name">{t.name}</div>
-                    <div className="role">{t.role}, {t.age} anos · {t.city}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* About */}
-      <section id="nosotros" className="about">
-        <div className="container">
-          <div className="section-head reveal">
-            <span className="eyebrow">Fundadores</span>
-            <h2>Quienes estan <em>detras de Aurum</em></h2>
-          </div>
-          <div className="about-grid reveal">
-            <div className="about-card">
-              <div className="about-img-wrapper">
-                <img src={IMG.daniel} alt="Daniel Segura" />
-              </div>
-              <p className="about-handle">@danielseguraf · 488K seguidores</p>
-              <h3>Daniel Segura</h3>
-              <p>+12 anos transformando hombres en 20 paises. Especialista en juego de texto, Instagram y tecnicas de PNL. Creador de la Metodologia de la Trinidad de la Seduccion.</p>
-            </div>
-            <div className="about-card">
-              <div className="about-img-wrapper">
-                <img src={IMG.natalia} alt="Natalia Buitrago" />
-              </div>
-              <p className="about-handle">@natabuitragom</p>
-              <h3>Natalia Buitrago</h3>
-              <p>El maximo exponente femenino de seduccion en habla hispana. Ensena desde la perspectiva femenina: lectura de senales, congruencia, lenguaje corporal y manejo de citas.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Benefits */}
-      <section className="benefits">
-        <div className="container">
-          <div className="section-head reveal">
-            <span className="eyebrow">El programa</span>
-            <h2>Lo que obtenes al unirte a <em>Aurum</em></h2>
-          </div>
-          <div className="benefits-grid reveal">
-            {BENEFITS.map((b, i) => (
-              <div key={i} className="benefit-card">
-                <div className="benefit-icon">{b.icon}</div>
-                <h3>{b.title}</h3>
-                <p>{b.text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Events */}
-      <section id="eventos" className="events">
-        <div className="container">
-          <div className="events-content reveal">
-            <div className="events-image">
-              <img src={IMG.event} alt="Evento Aurum en Bogota" />
-            </div>
-            <div className="events-text">
-              <span className="eyebrow">En vivo</span>
-              <h2>Eventos <em>presenciales</em></h2>
-              <p className="lede">Mas de 15 eventos en ciudades como Bogota, Buenos Aires y Mexico DF. Cientos de hombres transformando su vida en comunidad.</p>
-              <div className="events-stats">
-                <div><FaUsers size={18} /> +500 asistentes en total</div>
-                <div><FaCalendarCheck size={18} /> Proximo evento: Junio 2026</div>
-              </div>
-              <a href="/reservas" className="btn btn-primary" style={{ marginTop: 32 }}>
-                Reserva tu lugar <span className="arrow">→</span>
+            <h1 className="hero__title hero__intro-item" style={{ '--intro-i': 1 }}>
+              Transforma tu vida<br />
+              <span className="hero__title-accent text-shimmer">con mujeres de alto valor</span>
+            </h1>
+            <p className="hero__hook hero__intro-item" style={{ '--intro-i': 2 }}>
+              El sistema que ya usó{' '}
+              <FlipWords words={['un economista de 24', 'un ingeniero de 55', 'un abogado de 25', 'hombres en 20 países']} />
+              {' '}para dejar de conformarse y empezar a elegir.
+            </p>
+            <div className="hero__actions hero__intro-item" style={{ '--intro-i': 3 }}>
+              <a href="https://api.aurumteam.com/1a1daniel" className="btn btn-primary btn-lg shine-sweep">
+                Quiero mi sesión <FaArrowRight className="btn-arrow" />
+              </a>
+              <a href="#metodo" className="btn btn-ghost">
+                Ver el método
               </a>
             </div>
+            <div className="hero__stats hero__intro-item" style={{ '--intro-i': 4 }}>
+              <div className="hero__stat">
+                <span className="hero__stat-num"><NumberTicker value={488} suffix="K" /></span>
+                <span className="hero__stat-label">Seguidores</span>
+              </div>
+              <div className="hero__stat-divider" />
+              <div className="hero__stat">
+                <span className="hero__stat-num"><NumberTicker value={247} suffix="+" /></span>
+                <span className="hero__stat-label">Transformados</span>
+              </div>
+              <div className="hero__stat-divider" />
+              <div className="hero__stat">
+                <span className="hero__stat-num"><NumberTicker value={20} suffix="+" /></span>
+                <span className="hero__stat-label">Países</span>
+              </div>
+            </div>
           </div>
+        </div>
+
+        <div className="hero__scroll hero__intro-item" style={{ '--intro-i': 5 }}>
+          <div className="hero__scroll-line" />
         </div>
       </section>
 
-      {/* FAQ */}
-      <section className="faq">
+      {/* ─── Marquee ─── */}
+      <Marquee />
+
+      {/* ─── Trust bar ─── */}
+      <div className="trust-bar">
+        <div className="container trust-bar__inner">
+          <span className="trust-bar__label">Como visto en</span>
+          <div className="trust-bar__logos">
+            <span className="trust-bar__logo"><FaYoutube size={16} /> YouTube <strong>488K</strong></span>
+            <span className="trust-bar__logo"><FaInstagram size={16} /> Instagram <strong>500K+</strong></span>
+            <span className="trust-bar__logo"><FaTiktok size={14} /> TikTok <strong>200K+</strong></span>
+            <span className="trust-bar__logo">Hotmart <strong>Top Coach</strong></span>
+          </div>
+        </div>
+      </div>
+
+      {/* ─── About ─── */}
+      <Section className="about" id="sobre-mi">
         <div className="container">
-          <div className="section-head reveal">
-            <span className="eyebrow">Dudas frecuentes</span>
-            <h2>Preguntas <em>frecuentes</em></h2>
-          </div>
-          <div className="faq-list reveal">
-            {FAQ_DATA.map((item, i) => <FAQItem key={i} item={item} />)}
+          <motion.div variants={fadeUp} className="about__top">
+            <span className="eyebrow">Quiénes somos</span>
+            <h2>No enseñamos frases.<br />Creamos <em>hombres de alto valor</em>.</h2>
+          </motion.div>
+          <div className="about__cards">
+            <motion.div variants={fadeUp} className="about__card">
+              <div className="about__card-photo">
+                <img src={IMG.daniel} alt="Daniel Segura" loading="lazy" />
+              </div>
+              <div className="about__card-info">
+                <h3>Daniel Segura</h3>
+                <span className="about__card-role">Co-fundador · Head Coach</span>
+                <p>+12 años transformando hombres en 20 países. Creador de la Trinidad de la Seducción.</p>
+                <a href="https://instagram.com/danielseguraf" target="_blank" rel="noreferrer" className="about__card-link"><FaInstagram /> 488K seguidores</a>
+              </div>
+            </motion.div>
+            <motion.div variants={fadeUp} custom={1} className="about__card">
+              <div className="about__card-photo">
+                <img src={IMG.natalia} alt="Natalia Buitrago" loading="lazy" />
+              </div>
+              <div className="about__card-info">
+                <h3>Natalia Buitrago</h3>
+                <span className="about__card-role">Co-fundadora · Coach Senior</span>
+                <p>Máximo exponente femenino de seducción en habla hispana. Te enseña a leer señales y conectar.</p>
+                <a href="https://instagram.com/natabuitragom" target="_blank" rel="noreferrer" className="about__card-link"><FaInstagram /> @natabuitragom</a>
+              </div>
+            </motion.div>
           </div>
         </div>
-      </section>
+      </Section>
 
-      {/* CTA Final */}
-      <section className="cta-final">
-        <div className="cta-final-content reveal">
-          <span className="eyebrow">Da el primer paso</span>
-          <h2>En 45 minutos vas a saber <em>exactamente que cambiar</em></h2>
-          <p className="lede" style={{ margin: '0 auto 48px', textAlign: 'center' }}>
-            Agenda una sesion de diagnostico. Un especialista analiza tu situacion y te muestra por donde empezar.
-          </p>
-          <div className="hero-ctas" style={{ justifyContent: 'center' }}>
-            <a href="/reservas" className="btn btn-primary">Agendar mi sesion <span className="arrow">→</span></a>
-            <a href="https://wa.me/message" className="btn btn-ghost"><FaWhatsapp /> Hablar por WhatsApp</a>
+      {/* ─── Statement ─── */}
+      <Section className="statement">
+        <video
+          className="statement__video"
+          autoPlay
+          loop
+          muted
+          playsInline
+          poster="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+        >
+          <source src="/hero-3.mp4" type="video/mp4" />
+        </video>
+        <div className="statement__overlay" />
+        <div className="glow-orb glow-orb--bronze" style={{ top: '-20%', right: '10%', width: 500, height: 500 }} />
+        <div className="container">
+          <motion.h2 variants={fadeUp} className="statement__text">
+            Sos exitoso en todo.<br />
+            Menos en <em className="text-shimmer">lo que más importa</em>.
+          </motion.h2>
+        </div>
+      </Section>
+
+      {/* ─── Pain ─── */}
+      <Section className="pain">
+        <div className="pain__bg" />
+        <div className="container">
+          <motion.div variants={fadeUp} className="pain__intro">
+            <span className="eyebrow">¿Te suena familiar?</span>
+            <h2>El éxito no te sirve<br />si volvés <em>solo a casa</em></h2>
+          </motion.div>
+          <div className="pain__list">
+            {[
+              { num: '01', img: 'https://images.pexels.com/photos/14973800/pexels-photo-14973800.jpeg?auto=compress&cs=tinysrgb&w=600', title: 'Éxito vacío', text: 'Tenés plata, auto, departamento... pero volvés solo a tu casa todas las noches.' },
+              { num: '02', img: 'https://images.pexels.com/photos/11564271/pexels-photo-11564271.jpeg?auto=compress&cs=tinysrgb&w=600', title: 'Oportunidades perdidas', text: 'Ves pasar mujeres que te gustan y no te animás a hablarles. Después te odiás por eso.' },
+              { num: '03', img: 'https://images.pexels.com/photos/6833571/pexels-photo-6833571.jpeg?auto=compress&cs=tinysrgb&w=600', title: 'Apps que no funcionan', text: 'Probaste apps de citas. Matches que no responden. Citas que no van a ningún lado.' },
+              { num: '04', img: 'https://images.pexels.com/photos/7533346/pexels-photo-7533346.jpeg?auto=compress&cs=tinysrgb&w=600', title: 'Merecés más', text: 'Sabés que merecés más, pero no sabés cómo conseguirlo sin parecer desesperado.' },
+            ].map((item, i) => (
+              <motion.div key={i} variants={fadeUp} custom={i} className={`pain__row ${i % 2 ? 'pain__row--reverse' : ''}`}>
+                <div className="pain__row-img">
+                  <img src={item.img} alt="" loading="lazy" />
+                  <span className="pain__row-num">{item.num}</span>
+                </div>
+                <div className="pain__row-body">
+                  <h3>{item.title}</h3>
+                  <p>{item.text}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+          <motion.div variants={fadeUp} className="pain__closer">
+            <div className="pain__closer-line" />
+            <p>Si te sentiste identificado con al menos una,<br />
+            <strong>el Método Aurum fue creado para vos.</strong></p>
+            <a href="#metodo" className="btn btn-ghost pain__btn">
+              Ver el método <FaArrowRight className="btn-arrow" />
+            </a>
+          </motion.div>
+        </div>
+      </Section>
+
+      {/* ─── Metodo ─── */}
+      <Section className="metodo dot-grid" id="metodo">
+        <div className="container">
+          <motion.div variants={fadeUp} className="metodo__header">
+            <span className="eyebrow">Método Aurum</span>
+            <h2>Tres pilares de la <em>transformación</em></h2>
+          </motion.div>
+
+          <div className="metodo__cards">
+            {[
+              { num: '01', title: 'Mentalidad de Abundancia', desc: 'Transformamos tu mentalidad de raíz para que dejes de conformarte con lo que te toca y empieces a elegir conscientemente.', img: 'https://images.pexels.com/photos/2220337/pexels-photo-2220337.jpeg?auto=compress&cs=tinysrgb&w=800', icon: '🦁' },
+              { num: '02', title: 'Apertura y Conexión', desc: 'Te enseñamos a acercarte a cualquier mujer en cualquier ambiente con naturalidad absoluta. Eliminá la ansiedad para siempre.', img: 'https://images.pexels.com/photos/1058277/pexels-photo-1058277.jpeg?auto=compress&cs=tinysrgb&w=800', icon: '⚡' },
+              { num: '03', title: 'Práctica Real en Campo', desc: 'Salidas de campo donde te acompañamos en vivo. Verás demostraciones directas y comprobarás que funciona.', img: 'https://images.pexels.com/photos/14780178/pexels-photo-14780178.jpeg?auto=compress&cs=tinysrgb&w=800', icon: '🎯' },
+            ].map((item, i) => (
+              <motion.article key={i} variants={fadeUp} custom={i} className="metodo__card">
+                <div className="metodo__card-img">
+                  <img src={item.img} alt={item.title} loading="lazy" />
+                </div>
+                <div className="metodo__card-body">
+                  <span className="metodo__card-num">{item.num}</span>
+                  <h3>{item.title}</h3>
+                  <p>{item.desc}</p>
+                </div>
+              </motion.article>
+            ))}
           </div>
         </div>
-      </section>
+      </Section>
 
-      {/* Footer */}
+      {/* ─── Video ─── */}
+      <VslSection />
+
+      {/* ─── Results ─── */}
+      <Section className="results dot-grid" id="resultados">
+        <div className="glow-orb glow-orb--bronze" style={{ bottom: '10%', left: '5%', width: 500, height: 500 }} />
+        <div className="glow-orb glow-orb--blue" style={{ top: '15%', right: '10%', width: 400, height: 400 }} />
+        <div className="container">
+          <motion.div variants={fadeUp} className="results__header">
+            <span className="eyebrow">Ellos estaban igual que vos</span>
+            <h2>Hasta que decidieron <em>actuar</em></h2>
+          </motion.div>
+          <div className="results__grid">
+            {TESTIMONIALS.map((t, i) => (
+              <motion.div key={i} variants={fadeUp} custom={i} className="results__card card-lift">
+                <div className="results__card-video">
+                  <video controls preload="metadata" controlsList="nodownload" playsInline>
+                    <source src={t.video} type="video/mp4" />
+                  </video>
+                </div>
+                <div className="results__card-body">
+                  <div className="results__stars">
+                    {[...Array(5)].map((_, j) => <FaStar key={j} />)}
+                  </div>
+                  <p className="results__before">{t.before}</p>
+                  <p className="results__text">{t.text}</p>
+                  <div className="results__author">
+                    <span className="results__name">{t.name}, {t.age}</span>
+                    <span className="results__meta">{t.role}</span>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+          <motion.div variants={fadeIn} className="results__label">
+            <span className="eyebrow">247+ hombres transformados en 20 países</span>
+          </motion.div>
+        </div>
+      </Section>
+
+      {/* ─── Social proof scroll ─── */}
+      <Section className="proof" style={{ position: 'relative' }}>
+        <div className="glow-orb glow-orb--bronze" style={{ top: '30%', left: '50%', width: 500, height: 500 }} />
+        <div className="container">
+          <motion.div variants={fadeUp} className="proof__header">
+            <span className="eyebrow">Casos de éxito reales</span>
+            <h2>35+ transformaciones <em>documentadas</em></h2>
+          </motion.div>
+        </div>
+        <motion.div variants={fadeIn} className="proof__scroll">
+          <div className="proof__track proof__track--auto">
+            {[IMG.proof1, IMG.proof2, IMG.proof3, IMG.proof4, IMG.proof5, IMG.proof6, IMG.proof7, IMG.proof8, IMG.proof9, IMG.proof10, IMG.proof1, IMG.proof2, IMG.proof3, IMG.proof4, IMG.proof5, IMG.proof6, IMG.proof7, IMG.proof8, IMG.proof9, IMG.proof10].map((src, i) => (
+              <div key={i} className="proof__card card-lift">
+                <img src={src} alt={`Caso de éxito ${(i % 10) + 1}`} loading="lazy" />
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      </Section>
+
+      {/* ─── YouTube Content ─── */}
+      <Section className="yt-content">
+        <div className="container">
+          <motion.div variants={fadeUp} className="yt-content__header">
+            <span className="eyebrow">Contenido gratuito</span>
+            <h2>Conoce a Daniel <em>en acción</em></h2>
+            <p className="lede">Antes de invertir un centavo, mirá su contenido. Más de 3.7K suscriptores ya lo siguen por algo.</p>
+          </motion.div>
+          <div className="yt-content__grid">
+            {[
+              { title: 'Nunca digas "qué linda eres" | MEJOR usa esta TÉCNICA', views: '13K vistas', duration: '6:55', href: 'https://www.youtube.com/watch?v=bPmiNJv7zR4', thumb: 'https://img.youtube.com/vi/bPmiNJv7zR4/hqdefault.jpg' },
+              { title: 'El nuevo método para conquistar mujeres en 2026 | NO PIDAS EL NÚMERO', views: '7.1K vistas', duration: '14:35', href: 'https://www.youtube.com/watch?v=BPL-rLibFYM', thumb: 'https://img.youtube.com/vi/BPL-rLibFYM/hqdefault.jpg' },
+              { title: 'El 87% de los hombres NUNCA tendrá a la mujer que quiere', views: '4.2K vistas', duration: '34:08', href: 'https://www.youtube.com/watch?v=AP-Dh2Ed7Zc', thumb: 'https://img.youtube.com/vi/AP-Dh2Ed7Zc/hqdefault.jpg' },
+            ].map((video, i) => (
+              <motion.a
+                key={i}
+                variants={fadeUp}
+                custom={i}
+                href={video.href}
+                target="_blank"
+                rel="noreferrer"
+                className="yt-card card-lift"
+              >
+                <div className="yt-card__thumb">
+                  {video.thumb ? (
+                    <img src={video.thumb} alt={video.title} loading="lazy" />
+                  ) : (
+                    <div className="yt-card__thumb-placeholder">
+                      <FaYoutube size={32} />
+                    </div>
+                  )}
+                  <div className="yt-card__play">
+                    <FaPlay size={14} />
+                  </div>
+                  <span className="yt-card__duration">{video.duration}</span>
+                </div>
+                <div className="yt-card__info">
+                  <strong>{video.title}</strong>
+                  <span>{video.views}</span>
+                </div>
+              </motion.a>
+            ))}
+          </div>
+          <motion.div variants={fadeUp} className="yt-content__cta">
+            <a href="https://youtube.com/@teoriadepoder" target="_blank" rel="noreferrer" className="btn btn-ghost">
+              <FaYoutube /> Ver canal completo <FaArrowRight className="btn-arrow" />
+            </a>
+          </motion.div>
+        </div>
+      </Section>
+
+      {/* ─── Contact CTA ─── */}
+      <Section className="contact" id="contacto">
+        <video
+          className="contact__video"
+          autoPlay loop muted playsInline
+          poster="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+        >
+          <source src="/hero-1.mp4" type="video/mp4" />
+        </video>
+        <div className="contact__video-overlay" />
+        <div className="container">
+          <motion.div variants={fadeUp} className="contact__layout">
+            <div className="contact__left">
+              <span className="eyebrow">Solo 5 cupos por semana</span>
+              <h2>Cada semana que pasa<br />sin actuar, <em>ella pasa<br />de largo</em></h2>
+              <p className="contact__sub">La sesión con Daniel tiene cupos limitados. No es para todos — es para hombres que están listos para cambiar.</p>
+              <div className="contact__actions">
+                <a href="https://api.aurumteam.com/1a1daniel" className="btn btn-primary btn-lg shine-sweep">
+                  Reservar mi lugar <FaArrowRight className="btn-arrow" />
+                </a>
+                <a href="https://wa.me/" className="btn btn-ghost" target="_blank" rel="noreferrer">
+                  <FaWhatsapp /> Tengo dudas
+                </a>
+              </div>
+            </div>
+            <div className="contact__right">
+              {[
+                { icon: <FaCalendarAlt />, title: 'Sesión de diagnóstico 1 a 1', sub: '60 min con Daniel personalmente' },
+                { icon: <FaMapMarkerAlt />, title: 'Eventos presenciales', sub: 'Bogotá, Buenos Aires, México DF' },
+                { icon: <FaGlobeAmericas />, title: '100% virtual', sub: 'Estudiantes en 20+ países' },
+              ].map((item, i) => (
+                <motion.div key={i} variants={fadeUp} className="contact__detail card-lift">
+                  {item.icon}
+                  <div>
+                    <strong>{item.title}</strong>
+                    <span>{item.sub}</span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </Section>
+
+      {/* ─── Footer ─── */}
       <footer className="footer">
-        <div className="footer-inner">
-          <div className="footer-brand">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <path d="M12 3 L22 21 L2 21 Z" stroke="#c9a84c" strokeWidth="1.5" fill="none" />
-              <path d="M12 9 L17 19 L7 19 Z" fill="#c9a84c" />
-            </svg>
-            <span className="gold-text">AURUM TEAM</span>
+        <div className="footer__inner">
+          <div className="footer__top">
+            <span className="nav__wordmark">AURUM</span>
+            <div className="footer__links">
+              <a href="#sobre-mi">Sobre mí</a>
+              <a href="#metodo">Método</a>
+              <a href="#resultados">Resultados</a>
+              <a href="#contacto">Contacto</a>
+            </div>
+            <div className="footer__social">
+              <a href="https://instagram.com/danielseguraf" target="_blank" rel="noreferrer" aria-label="Instagram"><FaInstagram /></a>
+              <a href="https://youtube.com/@teoriadepoder" target="_blank" rel="noreferrer" aria-label="YouTube"><FaYoutube /></a>
+              <a href="https://tiktok.com/@danielseguraf" target="_blank" rel="noreferrer" aria-label="TikTok"><FaTiktok /></a>
+              <a href="https://wa.me/" target="_blank" rel="noreferrer" aria-label="WhatsApp"><FaWhatsapp /></a>
+            </div>
           </div>
-          <div className="footer-socials">
-            <a href="https://instagram.com/danielseguraf" target="_blank" rel="noreferrer"><FaInstagram size={18} /></a>
-            <a href="#" target="_blank" rel="noreferrer"><FaYoutube size={18} /></a>
-            <a href="#" target="_blank" rel="noreferrer"><FaWhatsapp size={18} /></a>
+          <div className="gradient-line" />
+          <div className="footer__bottom">
+            <p>&copy; 2026 Aurum Team</p>
           </div>
-          <p className="footer-copy">&copy; 2026 Aurum Team · Todos los derechos reservados</p>
         </div>
       </footer>
+
+      {/* ─── Sticky mobile CTA ─── */}
+      <div className="sticky-cta">
+        <a href="https://api.aurumteam.com/1a1daniel" className="btn btn-primary shine-sweep sticky-cta__btn">
+          Reservar mi lugar <FaArrowRight className="btn-arrow" />
+        </a>
+      </div>
     </div>
   );
 }
